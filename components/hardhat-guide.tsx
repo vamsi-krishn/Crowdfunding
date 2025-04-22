@@ -81,7 +81,7 @@ export function HardhatGuide() {
                   <ul className="list-disc pl-4 mt-2 space-y-1">
                     <li>Network Name: Hardhat Local</li>
                     <li>New RPC URL: http://127.0.0.1:8545</li>
-                    <li>Chain ID: 31337</li>
+                    <li>Chain ID: 1337</li>
                     <li>Currency Symbol: ETH</li>
                   </ul>
                 </li>

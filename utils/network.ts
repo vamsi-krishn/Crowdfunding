@@ -23,7 +23,7 @@ export const TEST_NETWORKS = {
     blockExplorerUrls: ["https://goerli.etherscan.io"],
   },
   HARDHAT: {
-    chainId: "0x7A69", // 31337 in hex
+    chainId: "0x539", // 1337 in hex
     chainName: "Hardhat Local",
     nativeCurrency: {
       name: "Hardhat Ether",
