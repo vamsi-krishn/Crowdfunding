@@ -6,10 +6,10 @@ import { Button } from "@/components/ui/button"
 import { Input } from "@/components/ui/input"
 import { Label } from "@/components/ui/label"
 import { Alert, AlertDescription, AlertTitle } from "@/components/ui/alert"
-import { AlertTriangle, ExternalLink } from "lucide-react"
+import { AlertTriangle, ExternalLink, Server } from "lucide-react"
 import confetti from "canvas-confetti"
 import { useToast } from "@/hooks/use-toast"
-import { isTestNetwork, getNetworkName, switchToTestNetwork } from "@/utils/network"
+import { isTestNetwork, getNetworkName, switchToTestNetwork, isHardhatNetwork } from "@/utils/network"
 
 interface DonationOverlayProps {
   isOpen: boolean
@@ -186,6 +186,7 @@ export function DonationOverlay({ isOpen, onClose, projectTitle }: DonationOverl
 
   const isOnTestNetwork = chainId ? isTestNetwork(chainId) : false
   const networkName = chainId ? getNetworkName(chainId) : "Unknown"
+  const isOnHardhat = chainId ? isHardhatNetwork(chainId) : false
 
   return (
     <Dialog open={isOpen} onOpenChange={onClose}>
@@ -209,6 +210,16 @@ export function DonationOverlay({ isOpen, onClose, projectTitle }: DonationOverl
             <AlertTitle>Wrong network</AlertTitle>
             <AlertDescription>
               You're currently on {networkName}. Please switch to a test network to make a donation.
+            </AlertDescription>
+          </Alert>
+        )}
+
+        {account && isOnHardhat && (
+          <Alert className="mb-4">
+            <Server className="h-4 w-4" />
+            <AlertTitle>Hardhat Local Network</AlertTitle>
+            <AlertDescription>
+              You're using Hardhat local network. Your test accounts have 10,000 ETH available for testing.
             </AlertDescription>
           </Alert>
         )}
@@ -254,14 +265,16 @@ export function DonationOverlay({ isOpen, onClose, projectTitle }: DonationOverl
 
           <div className="text-xs text-muted-foreground">
             <p>This is a test application. Donations use test ETH on test networks only.</p>
-            <a
-              href="https://sepoliafaucet.com/"
-              target="_blank"
-              rel="noopener noreferrer"
-              className="text-blue-500 hover:underline inline-flex items-center mt-1"
-            >
-              Get test ETH <ExternalLink className="h-3 w-3 ml-1" />
-            </a>
+            {!isOnHardhat && (
+              <a
+                href="https://sepoliafaucet.com/"
+                target="_blank"
+                rel="noopener noreferrer"
+                className="text-blue-500 hover:underline inline-flex items-center mt-1"
+              >
+                Get test ETH <ExternalLink className="h-3 w-3 ml-1" />
+              </a>
+            )}
           </div>
 
           <Button

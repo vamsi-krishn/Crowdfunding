@@ -4,8 +4,16 @@ import { useState, useEffect } from "react"
 import { Button } from "@/components/ui/button"
 import { useToast } from "@/hooks/use-toast"
 import { Popover, PopoverContent, PopoverTrigger } from "@/components/ui/popover"
-import { isTestNetwork, getNetworkName, switchToTestNetwork, DEFAULT_TEST_NETWORK, getFaucetUrl } from "@/utils/network"
-import { ExternalLink, AlertTriangle } from "lucide-react"
+import {
+  isTestNetwork,
+  getNetworkName,
+  switchToTestNetwork,
+  getFaucetUrl,
+  TEST_NETWORKS,
+  isHardhatNetwork,
+} from "@/utils/network"
+import { ExternalLink, AlertTriangle, Server } from "lucide-react"
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select"
 
 export function WalletConnect() {
   const [account, setAccount] = useState<string | null>(null)
@@ -109,16 +117,19 @@ export function WalletConnect() {
     }
   }
 
-  const switchNetwork = async () => {
+  const switchNetwork = async (networkKey: string) => {
     if (!window.ethereum) return
+
+    const network = TEST_NETWORKS[networkKey as keyof typeof TEST_NETWORKS]
+    if (!network) return
 
     setIsSwitchingNetwork(true)
     try {
-      const success = await switchToTestNetwork(window.ethereum)
+      const success = await switchToTestNetwork(window.ethereum, network)
       if (success) {
         toast({
           title: "Network switched",
-          description: `Switched to ${DEFAULT_TEST_NETWORK.chainName} test network`,
+          description: `Switched to ${network.chainName} test network`,
         })
       }
     } catch (error) {
@@ -142,10 +153,12 @@ export function WalletConnect() {
 
     const isTest = isTestNetwork(chainId)
     const networkName = getNetworkName(chainId)
+    const isHardhat = isHardhatNetwork(chainId)
 
     return (
       <div className={`text-xs ${isTest ? "text-green-500" : "text-red-500"} flex items-center gap-1`}>
         {!isTest && <AlertTriangle className="w-3 h-3" />}
+        {isHardhat && <Server className="w-3 h-3 mr-1" />}
         {networkName}
       </div>
     )
@@ -187,19 +200,27 @@ export function WalletConnect() {
                 <h4 className="font-medium text-sm">Network</h4>
                 <p className="text-xs">{chainId ? getNetworkName(chainId) : "Unknown"}</p>
 
-                {chainId && !isTestNetwork(chainId) && (
-                  <Button
-                    variant="outline"
-                    size="sm"
-                    className="mt-2 w-full"
-                    onClick={switchNetwork}
-                    disabled={isSwitchingNetwork}
-                  >
-                    {isSwitchingNetwork ? "Switching..." : "Switch to Test Network"}
-                  </Button>
-                )}
+                <div className="mt-2 space-y-2">
+                  <h4 className="font-medium text-sm">Switch Network</h4>
+                  <Select onValueChange={switchNetwork}>
+                    <SelectTrigger className="w-full">
+                      <SelectValue placeholder="Select a test network" />
+                    </SelectTrigger>
+                    <SelectContent>
+                      <SelectItem value="SEPOLIA">Sepolia</SelectItem>
+                      <SelectItem value="GOERLI">Goerli</SelectItem>
+                      <SelectItem value="HARDHAT">Hardhat Local</SelectItem>
+                    </SelectContent>
+                  </Select>
+                </div>
 
                 {chainId && isTestNetwork(chainId) && getFaucetLink()}
+
+                {isHardhatNetwork(chainId) && (
+                  <p className="text-xs text-green-500 mt-2">
+                    Connected to Hardhat local network. You have access to test accounts with 10,000 ETH each.
+                  </p>
+                )}
               </div>
             </div>
           </PopoverContent>
