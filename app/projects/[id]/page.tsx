@@ -8,6 +8,7 @@ import { Progress } from "@/components/ui/progress"
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card"
 import { BookOpen, Leaf, Cpu, Palette, Heart, Users, LayoutGrid } from "lucide-react"
 import { DonationOverlay } from "@/components/donation-overlay"
+import { TestNetworkGuide } from "@/components/test-network-guide"
 import projectsData from "@/data/projects.json"
 
 const categoryIcons = {
@@ -69,13 +70,16 @@ export default function ProjectPage({ params }: { params: { id: string } }) {
           <div className="space-y-4">
             <Progress value={progress} className="h-4" />
             <div className="flex justify-between text-lg">
-              <span>${project.raised.toLocaleString()} raised</span>
-              <span>${project.goal.toLocaleString()} goal</span>
+              <span>{project.raised.toFixed(4)} ETH raised</span>
+              <span>{project.goal.toFixed(4)} ETH goal</span>
             </div>
             <p className="text-muted-foreground">{project.daysLeft} days left to fund this project</p>
           </div>
         </CardContent>
       </Card>
+
+      <TestNetworkGuide />
+
       <Card>
         <CardContent className="pt-6">
           <Button size="lg" className="w-full" onClick={() => setIsDonationOverlayOpen(true)}>

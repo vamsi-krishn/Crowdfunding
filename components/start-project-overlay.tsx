@@ -68,14 +68,15 @@ export function StartProjectOverlay({ isOpen, onClose }: StartProjectOverlayProp
             />
           </div>
           <div className="space-y-2">
-            <Label htmlFor="amount">Funding Goal</Label>
+            <Label htmlFor="amount">Funding Goal (ETH)</Label>
             <Input
               id="amount"
-              placeholder="Enter funding goal"
+              placeholder="Enter funding goal in ETH"
               value={amount}
               onChange={(e) => setAmount(e.target.value)}
               type="number"
-              min="1"
+              min="0.01"
+              step="0.01"
             />
           </div>
           <div className="space-y-2">

@@ -3,8 +3,9 @@
 import { useState } from "react"
 import Link from "next/link"
 import { Button } from "@/components/ui/button"
-import { Menu, X, Users } from "lucide-react"
+import { Menu, X, Wallet } from "lucide-react"
 import { StartProjectOverlay } from "@/components/start-project-overlay"
+import { WalletConnect } from "@/components/wallet-connect"
 
 export function Navigation() {
   const [isMenuOpen, setIsMenuOpen] = useState(false)
@@ -17,13 +18,14 @@ export function Navigation() {
       <div className="container mx-auto px-4 py-4">
         <div className="flex justify-between items-center">
           <Link href="/" className="flex items-center space-x-2">
-            <Users className="h-6 w-6" />
+            <Wallet className="h-6 w-6" />
             <span className="text-xl font-bold">Crowdfunding Central</span>
           </Link>
-          <div className="hidden md:flex space-x-2">
+          <div className="hidden md:flex space-x-2 items-center">
             <Button variant="ghost" asChild>
               <Link href="/">Home</Link>
             </Button>
+            <WalletConnect />
             <Button variant="default" onClick={() => setIsStartProjectOpen(true)}>
               Start a Project
             </Button>
@@ -39,6 +41,9 @@ export function Navigation() {
                 Home
               </Link>
             </Button>
+            <div className="py-2">
+              <WalletConnect />
+            </div>
             <Button
               variant="default"
               className="w-full"

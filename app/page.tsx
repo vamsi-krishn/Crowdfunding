@@ -6,6 +6,7 @@ import { CategoryFilter } from "@/components/category-filter"
 import { Button } from "@/components/ui/button"
 import projectsData from "@/data/projects.json"
 import { StartProjectOverlay } from "@/components/start-project-overlay"
+import { TestNetworkGuide } from "@/components/test-network-guide"
 
 const categories = Array.from(new Set(projectsData.map((project) => project.category)))
 
@@ -21,12 +22,15 @@ export default function Home() {
       <div className="text-center space-y-4">
         <h1 className="text-5xl tracking-tight">Support Our Community</h1>
         <p className="text-xl text-muted-foreground">
-          Discover and fund amazing projects that make a difference in our global community.
+          Discover and fund amazing projects with ETH on our decentralized crowdfunding platform.
         </p>
         <Button size="lg" className="mt-4" onClick={() => setIsStartProjectOpen(true)}>
           Start Your Campaign
         </Button>
       </div>
+
+      <TestNetworkGuide />
+
       <CategoryFilter
         categories={categories}
         selectedCategory={selectedCategory}
