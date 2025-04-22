@@ -15,16 +15,3 @@ Any changes you make to your deployed app will be automatically pushed to this r
 Your project is live at:
 
 **[https://vercel.com/krishnafacebookhero3-gmailcoms-projects/v0-community-crowdfunding](https://vercel.com/krishnafacebookhero3-gmailcoms-projects/v0-community-crowdfunding)**
-
-## Build your app
-
-Continue building your app on:
-
-**[https://v0.dev/chat/projects/6HIoS3CGqW2](https://v0.dev/chat/projects/6HIoS3CGqW2)**
-
-## How It Works
-
-1. Create and modify your project using [v0.dev](https://v0.dev)
-2. Deploy your chats from the v0 interface
-3. Changes are automatically pushed to this repository
-4. Vercel deploys the latest version from this repository
