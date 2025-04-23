@@ -1,7 +1,7 @@
 "use client"
 
 import { useState } from "react"
-import { notFound } from "next/navigation"
+import { useRouter } from "next/navigation"
 import Image from "next/image"
 import { Button } from "@/components/ui/button"
 import { Progress } from "@/components/ui/progress"
@@ -9,7 +9,7 @@ import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card"
 import { BookOpen, Leaf, Cpu, Palette, Heart, Users, LayoutGrid } from "lucide-react"
 import { DonationOverlay } from "@/components/donation-overlay"
 import { TestNetworkGuide } from "@/components/test-network-guide"
-import projectsData from "@/data/projects.json"
+import { useProjects } from "@/hooks/use-projects"
 
 const categoryIcons = {
   All: LayoutGrid,
@@ -33,10 +33,35 @@ const categoryColors = {
 
 export default function ProjectPage({ params }: { params: { id: string } }) {
   const [isDonationOverlayOpen, setIsDonationOverlayOpen] = useState(false)
-  const project = projectsData.find((p) => p.id === Number.parseInt(params.id))
+  const { getProject, isLoading, updateProject } = useProjects()
+  const router = useRouter()
+
+  const projectId = Number.parseInt(params.id)
+  const project = getProject(projectId)
+
+  // Handle donation completion
+  const handleDonationComplete = (amount: number) => {
+    if (project) {
+      const updatedProject = {
+        ...project,
+        raised: project.raised + amount,
+      }
+      updateProject(updatedProject)
+    }
+  }
+
+  if (isLoading) {
+    return <div className="flex justify-center items-center min-h-[50vh]">Loading project...</div>
+  }
 
   if (!project) {
-    notFound()
+    return (
+      <div className="text-center py-12">
+        <h2 className="text-2xl font-bold mb-4">Project Not Found</h2>
+        <p className="text-muted-foreground mb-6">The project you're looking for doesn't exist.</p>
+        <Button onClick={() => router.push("/")}>Back to Home</Button>
+      </div>
+    )
   }
 
   const progress = (project.raised / project.goal) * 100
@@ -59,7 +84,7 @@ export default function ProjectPage({ params }: { params: { id: string } }) {
         <CardContent>
           <div className="h-48 md:h-64 lg:h-80 max-w-2xl mx-auto mb-6 relative">
             <Image
-              src={project.imageUrl || "/placeholder.svg"}
+              src={project.imageUrl || "/placeholder.svg?height=400&width=800"}
               alt={project.title}
               width={800}
               height={400}
@@ -104,6 +129,7 @@ export default function ProjectPage({ params }: { params: { id: string } }) {
         isOpen={isDonationOverlayOpen}
         onClose={() => setIsDonationOverlayOpen(false)}
         projectTitle={project.title}
+        onDonationComplete={(amount) => handleDonationComplete(amount)}
       />
     </div>
   )

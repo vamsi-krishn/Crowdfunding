@@ -3,6 +3,7 @@ import { Card, CardContent, CardFooter, CardHeader, CardTitle } from "@/componen
 import { Button } from "@/components/ui/button"
 import { Progress } from "@/components/ui/progress"
 import { BookOpen, Leaf, Cpu, Palette, Heart, Users, LayoutGrid } from "lucide-react"
+import type { Project } from "@/types/project"
 
 const categoryIcons = {
   All: LayoutGrid,
@@ -22,16 +23,6 @@ const categoryColors = {
   "Arts & Culture": "text-pink-400",
   Wellness: "text-red-400",
   Community: "text-yellow-400",
-}
-
-interface Project {
-  id: number
-  title: string
-  description: string
-  goal: number
-  raised: number
-  daysLeft: number
-  category: string
 }
 
 export function ProjectCard({ project }: { project: Project }) {

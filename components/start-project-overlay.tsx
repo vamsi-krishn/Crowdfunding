@@ -8,23 +8,47 @@ import { Label } from "@/components/ui/label"
 import { Textarea } from "@/components/ui/textarea"
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select"
 import confetti from "canvas-confetti"
+import type { Project } from "@/types/project"
 
 interface StartProjectOverlayProps {
   isOpen: boolean
   onClose: () => void
+  onProjectCreate: (project: Omit<Project, "id" | "raised" | "imageUrl">) => void
 }
 
 const categories = ["Education", "Community", "Technology", "Environment", "Arts & Culture", "Wellness"]
 
-export function StartProjectOverlay({ isOpen, onClose }: StartProjectOverlayProps) {
+export function StartProjectOverlay({ isOpen, onClose, onProjectCreate }: StartProjectOverlayProps) {
   const [title, setTitle] = useState("")
   const [description, setDescription] = useState("")
   const [amount, setAmount] = useState("")
   const [category, setCategory] = useState("")
+  const [daysToFund, setDaysToFund] = useState("")
+  const [isSubmitting, setIsSubmitting] = useState(false)
+
+  const resetForm = () => {
+    setTitle("")
+    setDescription("")
+    setAmount("")
+    setCategory("")
+    setDaysToFund("")
+  }
 
   const handleSubmit = () => {
-    // Here you would handle the actual project submission
-    console.log("Project submitted:", { title, description, amount, category })
+    if (!title || !description || !amount || !category || !daysToFund) {
+      return
+    }
+
+    setIsSubmitting(true)
+
+    // Create the new project object
+    const newProject = {
+      title,
+      description,
+      goal: Number.parseFloat(amount),
+      daysLeft: Number.parseInt(daysToFund),
+      category,
+    }
 
     // Trigger confetti effect
     confetti({
@@ -33,16 +57,22 @@ export function StartProjectOverlay({ isOpen, onClose }: StartProjectOverlayProp
       origin: { y: 0.6 },
     })
 
+    // Pass the new project to the parent component
+    onProjectCreate(newProject)
+
     // Reset form and close overlay
-    setTitle("")
-    setDescription("")
-    setAmount("")
-    setCategory("")
+    resetForm()
+    setIsSubmitting(false)
     onClose()
   }
 
   return (
-    <Dialog open={isOpen} onOpenChange={onClose}>
+    <Dialog
+      open={isOpen}
+      onOpenChange={(open) => {
+        if (!open) onClose()
+      }}
+    >
       <DialogContent className="sm:max-w-[425px]">
         <DialogHeader>
           <DialogTitle>Start a New Project</DialogTitle>
@@ -80,6 +110,18 @@ export function StartProjectOverlay({ isOpen, onClose }: StartProjectOverlayProp
             />
           </div>
           <div className="space-y-2">
+            <Label htmlFor="days">Funding Duration (days)</Label>
+            <Input
+              id="days"
+              placeholder="Enter funding duration in days"
+              value={daysToFund}
+              onChange={(e) => setDaysToFund(e.target.value)}
+              type="number"
+              min="1"
+              max="90"
+            />
+          </div>
+          <div className="space-y-2">
             <Label htmlFor="category">Category</Label>
             <Select onValueChange={setCategory} value={category}>
               <SelectTrigger>
@@ -94,8 +136,12 @@ export function StartProjectOverlay({ isOpen, onClose }: StartProjectOverlayProp
               </SelectContent>
             </Select>
           </div>
-          <Button onClick={handleSubmit} className="w-full" disabled={!title || !description || !amount || !category}>
-            Create Project
+          <Button
+            onClick={handleSubmit}
+            className="w-full"
+            disabled={isSubmitting || !title || !description || !amount || !category || !daysToFund}
+          >
+            {isSubmitting ? "Creating..." : "Create Project"}
           </Button>
         </div>
       </DialogContent>

@@ -15,9 +15,10 @@ interface DonationOverlayProps {
   isOpen: boolean
   onClose: () => void
   projectTitle: string
+  onDonationComplete?: (amount: number) => void
 }
 
-export function DonationOverlay({ isOpen, onClose, projectTitle }: DonationOverlayProps) {
+export function DonationOverlay({ isOpen, onClose, projectTitle, onDonationComplete }: DonationOverlayProps) {
   const [amount, setAmount] = useState("")
   const [isAnonymous, setIsAnonymous] = useState(true)
   const [name, setName] = useState("")
@@ -47,25 +48,27 @@ export function DonationOverlay({ isOpen, onClose, projectTitle }: DonationOverl
         .catch(console.error)
 
       // Listen for chain changes
-      window.ethereum.on("chainChanged", (newChainId: string) => {
+      const handleChainChanged = (newChainId: string) => {
         setChainId(newChainId)
-      })
+      }
+      window.ethereum.on("chainChanged", handleChainChanged)
 
       // Listen for account changes
-      window.ethereum.on("accountsChanged", (accounts: string[]) => {
+      const handleAccountsChanged = (accounts: string[]) => {
         if (accounts.length > 0) {
           setAccount(accounts[0])
         } else {
           setAccount(null)
         }
-      })
-    }
+      }
+      window.ethereum.on("accountsChanged", handleAccountsChanged)
 
-    return () => {
-      // Clean up listeners
-      if (window.ethereum) {
-        window.ethereum.removeListener("chainChanged", () => {})
-        window.ethereum.removeListener("accountsChanged", () => {})
+      return () => {
+        // Clean up listeners
+        if (window.ethereum) {
+          window.ethereum.removeListener("chainChanged", handleChainChanged)
+          window.ethereum.removeListener("accountsChanged", handleAccountsChanged)
+        }
       }
     }
   }, [isOpen])
@@ -142,7 +145,8 @@ export function DonationOverlay({ isOpen, onClose, projectTitle }: DonationOverl
       const recipient = "0x0000000000000000000000000000000000000000"
 
       // Convert ETH to Wei (1 ETH = 10^18 Wei)
-      const weiAmount = BigInt(Number.parseFloat(amount) * 10 ** 18)
+      const amountValue = Number.parseFloat(amount)
+      const weiAmount = BigInt(Math.floor(amountValue * 10 ** 18))
 
       // Create transaction parameters
       const transactionParameters = {
@@ -165,6 +169,11 @@ export function DonationOverlay({ isOpen, onClose, projectTitle }: DonationOverl
         spread: 70,
         origin: { y: 0.6 },
       })
+
+      // Call the onDonationComplete callback if provided
+      if (onDonationComplete) {
+        onDonationComplete(amountValue)
+      }
 
       toast({
         title: "Donation successful!",
